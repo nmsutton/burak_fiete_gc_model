@@ -5,7 +5,6 @@
 simdur = 100e3; % total simulation time, ms
 ncells = 30*30; % total number of cells in network
 tau = 10; %% Cell parameters % grid cell synapse time constant, ms
-tind = 0; % time step number for indexing
 t = 0; % simulation time variable, ms
 load('data/W_Bu09_torus_n900_l2.mat'); % load weight matrix
 load('data/B_saved.mat'); % velocity input matrix
@@ -30,7 +29,7 @@ drawnow
 
 fprintf('Simulation starting. Press ctrl+c to end...\n') %% Simulation
 while t<simdur
-  tind = tind+1; t = dt*tind;
+  t = t+1;
 
   scl_gc_in = 0.5; % scale gc input
   in_firing = ((mex_hat*2)*(gc_firing*scl_gc_in)')';
@@ -45,7 +44,7 @@ while t<simdur
 
   % plotting
   custom_colormap = load('neuron_space_colormap.mat');
-  if livePlot>0 && (livePlot==1 || mod(tind,livePlot)==1)
+  if livePlot>0 && (livePlot==1 || mod(t,livePlot)==1)
     figure(h); ax(1) = subplot(131);
     imagesc(reshape(gc_firing,sqrt(ncells),sqrt(ncells)));
     colormap(ax(1),custom_colormap.CustomColormap2);
