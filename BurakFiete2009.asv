@@ -37,12 +37,12 @@ while t<simdur
   %ex_firing = ones(1,900)*1;
   ex_firing = 3-(7-(B*5));%*.5;
   %ex_firing = B*50;
-  ex_firing = round(ex_firing*400)/400; % round for carlsim
+  %ex_firing = round(ex_firing*10)/10; % round for carlsim
   new_firing = in_firing + ex_firing;
   new_firing = new_firing.*(new_firing>0);
   gc_firing = gc_firing + (new_firing - gc_firing)/tau;
   %gc_firing = round(gc_firing*10)/10; % round for carlsim
-  gc_firing = round(gc_firing*400)/400; % round for carlsim
+  gc_firing = round(gc_firing*500)/500; % round for carlsim
 
   % plotting
   custom_colormap = load('neuron_space_colormap.mat');
