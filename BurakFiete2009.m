@@ -13,6 +13,23 @@ load('data/B_saved.mat'); % velocity input matrix
 %gc_firing = rand(1,ncells);
 load('data/gc_firing_init.mat'); % initial gc firing
 mex_hat = W;%W*5;
+% filter out weights of neurons not matching example preferred direction
+if true
+    max_ind = sqrt(size(W(:,1)));
+    for x = 1:max_ind
+        for y = 1:max_ind
+            ind = ((y-1) * max_ind) + x;
+            if (get_pd(x,y) ~= 'r')                
+                %mex_hat(:,ind) = .1;
+                mex_hat(:,ind) = 0;
+                %B(ind) = 1;
+                B(ind) = 1;
+            else
+                B(ind) = 1.01;
+            end
+        end
+    end
+end
 
 % plotting
 spikeThresh = 0.1; % threshold for plotting a cell as having spiked
@@ -31,18 +48,22 @@ fprintf('Simulation starting. Press ctrl+c to end...\n') %% Simulation
 while t<simdur
   t = t+1;
 
-  scl_gc_in = 0.5; % scale gc input
-  in_firing = ((mex_hat*2)*(gc_firing*scl_gc_in)')';
-  in_firing = round(in_firing*400)/400; % round for carlsim
+  scl_gc_in = 2.1;%0.5; % scale gc input
+  in_firing = ((mex_hat*2.5)*(gc_firing*scl_gc_in)')';
+  %in_firing = round(in_firing*1000)/1000; % round for carlsim
+  %in_firing = round(in_firing*500)/500; % round for carlsim
   %ex_firing = ones(1,900)*1;
-  ex_firing = 3-(7-(B*5));%*.5;
+  %ex_firing = 4-(8-(B*7));%*.5;
   %ex_firing = B*50;
-  ex_firing = round(ex_firing*400)/400; % round for carlsim
+  ex_firing = B*.2;
+  %ex_firing = round(ex_firing*1000)/1000; % round for carlsim
+  %ex_firing = round(ex_firing*10)/10; % round for carlsim
   new_firing = in_firing + ex_firing;
   new_firing = new_firing.*(new_firing>0);
   gc_firing = gc_firing + (new_firing - gc_firing)/tau;
   %gc_firing = round(gc_firing*10)/10; % round for carlsim
-  gc_firing = round(gc_firing*400)/400; % round for carlsim
+  %gc_firing = round(gc_firing*1000)/1000; % round for carlsim
+  %gc_firing = round(gc_firing*500)/500; % round for carlsim
 
   % plotting
   custom_colormap = load('neuron_space_colormap.mat');
@@ -60,3 +81,20 @@ end
 
 % command to view matrices
 % gc_firing_reshaped = reshape(gc_firing,30,30);in_firing_reshaped = reshape(in_firing,30,30);ex_firing_reshaped = reshape(ex_firing,30,30);new_firing_reshaped = reshape(new_firing,30,30);
+
+function pd = get_pd(x, y)
+    % find neuron preferred direction
+	if (mod(y,2) == 0)
+		if (mod(x,2) == 0)
+			pd = 'd';
+		else 
+			pd = 'r';
+        end
+    else
+		if (mod(x,2) == 0)
+			pd = 'l';
+        else
+			pd = 'u';	
+        end
+    end
+end
